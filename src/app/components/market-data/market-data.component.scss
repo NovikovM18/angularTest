@@ -1,22 +1,42 @@
-.select {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 1rem;
+#market-data {
+  .select {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 12px;
+    
+    .select_ff {
+      width: 256px;
   
-  .select_ff {
-    min-width: 256px;
-
-    #clear-input-button {
-      position: absolute;
-      top: -6px;
-      right: -22px;
+      #clear-input-button {
+        position: absolute;
+        top: -6px;
+        right: -22px;
+      }
+    }
+  
+  
+    #select-button {
+      height: 56px;
     }
   }
 
-
-  #select-button {
-    height: 56px;
+  table {
+    tr {
+      cursor: pointer;
+      &:hover {
+        background-color: #E0E2EC;
+      }
+    }
   }
+
+  .table_btns {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
 }

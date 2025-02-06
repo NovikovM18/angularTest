@@ -1,5 +1,5 @@
-import {Component, OnInit} from '@angular/core';
-import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {Component} from '@angular/core';
+import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {Observable} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
 import {AsyncPipe} from '@angular/common';
@@ -8,8 +8,11 @@ import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatButtonModule} from '@angular/material/button';
 import {MarketData} from '../../_INTERFACES/market.interface';
-import {MatListModule} from '@angular/material/list';
 import {MatIconModule} from '@angular/material/icon';
+import {SelectionModel} from '@angular/cdk/collections';
+import {MatTableDataSource, MatTableModule} from '@angular/material/table';
+import {MatCheckboxModule} from '@angular/material/checkbox';
+
 
 @Component({
   selector: 'app-market-data',
@@ -21,8 +24,9 @@ import {MatIconModule} from '@angular/material/icon';
     MatAutocompleteModule,
     ReactiveFormsModule,
     AsyncPipe,
-    MatListModule,
-    MatIconModule
+    MatIconModule,
+    MatTableModule, 
+    MatCheckboxModule
   ],
   templateUrl: './market-data.component.html',
   styleUrl: './market-data.component.scss'
@@ -31,17 +35,15 @@ export class MarketDataComponent {
   marketDataControl = new FormControl<string | MarketData>('');
   filteredOptions!: Observable<MarketData[]>;
   selectedOption: MarketData | null = null;
-  selectedOptionArray: MarketData[] = [];
-  markedSelectedOptionArray: MarketData[] = [];
-  
   options: MarketData[] = [
     {name: 'Mary', value: 'mary'}, 
     {name: 'Shelley', value: 'shelley'}, 
     {name: 'Wally', value: 'wally'}
   ];
+  displayedColumns: string[] = ['select', 'name', 'price', 'time'];
+  dataSource = new MatTableDataSource<any>();
+  selection = new SelectionModel<any>(true, []);
 
-
-  constructor() { }
 
   ngOnInit() {
     this.filterOptions();
@@ -61,38 +63,48 @@ export class MarketDataComponent {
     return data && data.name ? data.name : '';
   }
 
-  private _filter(name: string): MarketData[] {
+  _filter(name: string): MarketData[] {
     const filterValue = name.toLowerCase();
     return this.options.filter(option => option.name.toLowerCase().includes(filterValue));
   }
 
   clearInput() {
-    console.log(this.marketDataControl);
     this.marketDataControl.reset();
-    
   }
 
   setSelectedOption(option: MarketData) {
-    if (this.selectedOptionArray.every((o) => o.value !== option.value)) {
+    if (this.dataSource.data.every((o) => o.value !== option.value)) {
       this.selectedOption = option;
     }
   }
 
   addOption() {
     if (this.selectedOption) {
-      this.selectedOptionArray.push(this.selectedOption);
+      this.dataSource.data = [...this.dataSource.data, this.selectedOption];
     }
     this.selectedOption = null;
     this.marketDataControl.reset();
   }
 
-  clearSelectedArray() {
-    console.log(this.markedSelectedOptionArray);
-    console.log(this.selectedOptionArray);
-    
-    this.selectedOptionArray = this.selectedOptionArray.filter((o) => this.markedSelectedOptionArray.every((o2) => o.value !== o2.value));
+  isAllSelected() {
+    const numSelected = this.selection.selected.length;
+    const numRows = this.dataSource.data.length;
+    return numSelected === numRows;
   }
 
+  toggleAllRows() {
+    if (this.isAllSelected()) {
+      this.selection.clear();
+      return;
+    }
+    this.selection.select(...this.dataSource.data);
+  }
+
+  deleteRows() {
+    this.dataSource.data = this.dataSource.data.filter((o) =>this.selection.selected.every((o2) => o.value !== o2.value));
+    this.selection.clear();
+
+  }
 
 
 }

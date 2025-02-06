@@ -1,9 +1,10 @@
-<form class="form">
-
+<div id="market-data" class="market-data">
+  <h2>market-data</h2>
+  
   <div class="select">
     <mat-form-field class="select_ff">
       <mat-label>Assignee</mat-label>
-      <input type="text" matInput [(ngModel)]="selectedOption" [matAutocomplete]="auto">
+      <input type="text" matInput [formControl]="marketDataControl" [matAutocomplete]="auto">
       
       @if (marketDataControl.value) {
         <button id="clear-input-button" mat-icon-button aria-label="Clear" (click)="clearInput()">
@@ -21,23 +22,51 @@
     <button mat-raised-button id="select-button" [disabled]="!selectedOption" (click)="addOption()">Add to Selected</button>
   </div>
 
-  <p>
-    Option selected: {{marketDataControl.value}} 
- </p>
-  
-  <p>
-    selectedOption: {{selectedOption?.name}} -- {{selectedOption?.value}} 
-  </p>
+  @if (dataSource.data.length) {
+    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+      <ng-container matColumnDef="select">
+        <th mat-header-cell *matHeaderCellDef>
+          <mat-checkbox 
+            (change)="$event ? toggleAllRows() : null"
+            [checked]="selection.hasValue() && isAllSelected()"
+            [indeterminate]="selection.hasValue() && !isAllSelected()"
+          >
+          </mat-checkbox>
+        </th>
+        <td mat-cell *matCellDef="let row">
+          <mat-checkbox 
+            (click)="$event.stopPropagation()"
+            (change)="$event ? selection.toggle(row) : null"
+            [checked]="selection.isSelected(row)"
+          >
+          </mat-checkbox>
+        </td>
+      </ng-container>
+    
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+      </ng-container>
+    
+      <ng-container matColumnDef="price">
+        <th mat-header-cell *matHeaderCellDef>Price</th>
+        <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+      </ng-container>
+    
+      <ng-container matColumnDef="time">
+        <th mat-header-cell *matHeaderCellDef>Time</th>
+        <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+      </ng-container>
+    
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="selection.toggle(row)"></tr>
+    </table>
 
-  <mat-selection-list #shoesList [(ngModel)]="markedSelectedOptionArray" name="shoes" [multiple]="true">
-    @for (option of selectedOptionArray; track option) {
-      <mat-list-option [value]="option">{{option.name}}</mat-list-option>
+    @if(selection.selected.length) {
+      <div class="table_btns">
+        <button mat-raised-button id="clear-button" (click)="deleteRows()">Clear Selected</button>
+      </div>
     }
-  </mat-selection-list>
+  }
 
-  <button mat-raised-button id="clear-button" [disabled]="!markedSelectedOptionArray.length" (click)="clearSelectedArray()">Clear Selected</button>
-
-  <p>
-     Option selected: {{markedSelectedOptionArray.length}} 
-  </p>
-</form>
+</div>

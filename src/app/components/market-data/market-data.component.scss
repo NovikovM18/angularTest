@@ -1,0 +1,22 @@
+.select {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 1rem;
+  
+  .select_ff {
+    min-width: 256px;
+
+    #clear-input-button {
+      position: absolute;
+      top: -6px;
+      right: -22px;
+    }
+  }
+
+
+  #select-button {
+    height: 56px;
+  }
+}

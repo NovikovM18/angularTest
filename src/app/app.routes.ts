@@ -1,8 +1,7 @@
 import { Routes } from '@angular/router';
-import { MarketAssetsComponent } from './view/market-assets/market-assets.component';
 
 export const routes: Routes = [
-  { path: 'market-assets', component: MarketAssetsComponent },
+  { path: 'market-assets', loadComponent:() => import('./view/market-assets/market-assets.component').then((c) => c.MarketAssetsComponent)},
   { path: '',   redirectTo: '/market-assets', pathMatch: 'full' },
   // { path: '**', component: PageNotFoundComponent },
 ];

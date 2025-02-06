@@ -1,5 +1,43 @@
-<div class="app">
-  <button mat-stroked-button>Basic</button>
-  <button mat-stroked-button disabled>Disabled</button>
-  <a mat-stroked-button href="https://www.google.com/" target="_blank">Link</a>
-</div>
+<form class="form">
+
+  <div class="select">
+    <mat-form-field class="select_ff">
+      <mat-label>Assignee</mat-label>
+      <input type="text" matInput [(ngModel)]="selectedOption" [matAutocomplete]="auto">
+      
+      @if (marketDataControl.value) {
+        <button id="clear-input-button" mat-icon-button aria-label="Clear" (click)="clearInput()">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+      
+      <mat-autocomplete #auto="matAutocomplete">
+        @for (option of filteredOptions | async; track option) {
+          <mat-option [value]="option.name" (onSelectionChange)="setSelectedOption(option)">{{option.name}}</mat-option>
+        }
+      </mat-autocomplete>
+    </mat-form-field>
+  
+    <button mat-raised-button id="select-button" [disabled]="!selectedOption" (click)="addOption()">Add to Selected</button>
+  </div>
+
+  <p>
+    Option selected: {{marketDataControl.value}} 
+ </p>
+  
+  <p>
+    selectedOption: {{selectedOption?.name}} -- {{selectedOption?.value}} 
+  </p>
+
+  <mat-selection-list #shoesList [(ngModel)]="markedSelectedOptionArray" name="shoes" [multiple]="true">
+    @for (option of selectedOptionArray; track option) {
+      <mat-list-option [value]="option">{{option.name}}</mat-list-option>
+    }
+  </mat-selection-list>
+
+  <button mat-raised-button id="clear-button" [disabled]="!markedSelectedOptionArray.length" (click)="clearSelectedArray()">Clear Selected</button>
+
+  <p>
+     Option selected: {{markedSelectedOptionArray.length}} 
+  </p>
+</form>

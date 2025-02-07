@@ -1,6 +1,6 @@
 import {Component} from '@angular/core';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {Observable} from 'rxjs';
+import {Observable, Subscription} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
 import {AsyncPipe} from '@angular/common';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
@@ -12,10 +12,13 @@ import {MatIconModule} from '@angular/material/icon';
 import {SelectionModel} from '@angular/cdk/collections';
 import {MatTableDataSource, MatTableModule} from '@angular/material/table';
 import {MatCheckboxModule} from '@angular/material/checkbox';
+import { WebsocketService } from '../../_SERVICES/websocket.service';
+import { PlatformService } from '../../_SERVICES/platform.service';
 
 
 @Component({
   selector: 'app-market-data',
+  standalone: true,
   imports: [
     MatButtonModule,
     FormsModule,
@@ -43,10 +46,19 @@ export class MarketDataComponent {
   displayedColumns: string[] = ['select', 'name', 'price', 'time'];
   dataSource = new MatTableDataSource<any>();
   selection = new SelectionModel<any>(true, []);
+  messages: any[] = [];
+  private messageSubscription!: Subscription;
 
+  constructor(
+    private PlatformService: PlatformService,
+    private webSocketService: WebsocketService,
+  ) {}
 
   ngOnInit() {
     this.filterOptions();
+    this.getMessage();
+    // this.getData();
+
   }
 
   filterOptions() {
@@ -70,6 +82,7 @@ export class MarketDataComponent {
 
   clearInput() {
     this.marketDataControl.reset();
+    this.selectedOption = null;
   }
 
   setSelectedOption(option: MarketData) {
@@ -104,6 +117,29 @@ export class MarketDataComponent {
     this.dataSource.data = this.dataSource.data.filter((o) =>this.selection.selected.every((o2) => o.value !== o2.value));
     this.selection.clear();
 
+  }
+
+
+
+  getData() {
+    this.PlatformService.getData().subscribe((res) => {
+      console.log(res);
+      
+    })
+  }
+
+
+  getMessage(): void {
+    this.webSocketService.connect()
+  }
+
+  sendMessage(): void {
+    this.webSocketService.sendMessage(`Hello, Server from ${this.selectedOption?.name || 'noone'}!`);
+  }
+
+  ngOnDestroy(): void {
+    this.messageSubscription.unsubscribe();
+    this.webSocketService.closeConnection();
   }
 
 
